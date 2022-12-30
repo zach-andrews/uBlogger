@@ -12,11 +12,35 @@
         {{- with $params.subtitle -}}
             <h2 class="single-subtitle">{{ . }}</h2>
         {{- end -}}
-
+        <!-- GregHilston custom modification to display information if post is in a series-->
+        <!-- This goes above our content. From https://npf.io/2014/08/making-it-a-series/ -->
+        {{if .Params.series}}
+        {{ $name := index .Params.series 0 }}
+        <p class="seriesname">This post is a part of the <a href="{{.Site.BaseURL}}/series/{{$name | urlize}}">{{$name}}</a> series.</p>
+        {{end}}
         {{- /* Content */ -}}
         <div class="content" id="content">
             {{- dict "Content" .Content "Ruby" $params.ruby "Fraction" $params.fraction | partial "function/content.html" | safeHTML -}}
         </div>
+
+        <!-- GregHilston custom modification to display information if post is in a series-->
+        <!-- This goes below our content. From https://npf.io/2014/08/making-it-a-series/ -->
+        {{ if .Params.series }}
+            {{ $name := index .Params.series 0 }}
+            <hr/>
+            <p><a href="" id="series"></a>This is a post in the
+            <b>{{$name}}</b> series.<br/>
+            Other posts in this series:</p>
+
+            {{ $name := $name | urlize }}
+            {{ $series := index .Site.Taxonomies.series $name }}
+            <ul class="series">
+                {{ range $series.Pages }}
+                    <li>{{.Date.Format "Jan 02, 2006"}} -
+                    <a href="{{.Permalink}}">{{.LinkTitle}}</a></li>
+                {{end}}
+            </ul>
+        {{end}}
 
         {{- /* Comment */ -}}
         {{- partial "comment.html" . -}}
